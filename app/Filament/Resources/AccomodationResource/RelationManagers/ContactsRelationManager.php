@@ -1,25 +1,23 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\AccomodationResource\RelationManagers;
 
-use App\Filament\Resources\ContactResource\Pages;
-use App\Filament\Resources\ContactResource\RelationManagers;
-use App\Filament\Resources\ContactResource\RelationManagers\AccomodationsRelationManager;
-use App\Models\Contact;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Resources\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ContactResource extends Resource
+class ContactsRelationManager extends RelationManager
 {
-    protected static ?string $model = Contact::class;
+    protected static string $relationship = 'contact';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    //protected static ?string $inverseRelationship = 'contact';
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -53,32 +51,19 @@ class ContactResource extends Resource
                 Tables\Columns\TextColumn::make('address'),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\ImageColumn::make('photo_url'),
             ])
             ->filters([
                 //
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            AccomodationsRelationManager::class
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListContacts::route('/'),
-            'create' => Pages\CreateContact::route('/create'),
-            'edit' => Pages\EditContact::route('/{record}/edit'),
-        ];
     }
 }

@@ -10,4 +10,9 @@ class Contact extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function accomodations()
+    {
+        return $this->hasMany(Accomodation::class, 'contact_id');
+    }
 }

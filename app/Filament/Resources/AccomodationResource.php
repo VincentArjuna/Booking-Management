@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ContactResource\Pages;
-use App\Filament\Resources\ContactResource\RelationManagers;
-use App\Filament\Resources\ContactResource\RelationManagers\AccomodationsRelationManager;
+use App\Filament\Resources\AccomodationResource\Pages;
+use App\Filament\Resources\AccomodationResource\RelationManagers;
+use App\Filament\Resources\AccomodationResource\RelationManagers\ContactsRelationManager;
+use App\Models\Accomodation;
 use App\Models\Contact;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
@@ -15,9 +16,9 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ContactResource extends Resource
+class AccomodationResource extends Resource
 {
-    protected static ?string $model = Contact::class;
+    protected static ?string $model = Accomodation::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
@@ -25,22 +26,22 @@ class ContactResource extends Resource
     {
         return $form
             ->schema([
-                Fieldset::make('Contact')
+                Fieldset::make('Accomodation')
                     ->schema([
-                        Forms\Components\FileUpload::make('photo_url')
-                            ->avatar()
+                        Forms\Components\FileUpload::make('image_url')
                             ->columnSpan('full'),
+
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('address')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('phone')
-                            ->tel()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('email')
-                            ->email()
-                            ->maxLength(255),
+                        Forms\Components\Toggle::make('is_active')
+                            ->required()
+                            ->inline(false),
+                        Forms\Components\Select::make('contact_id')
+                            ->label('Contact')
+                            ->options(Contact::all()->pluck('name', 'id'))
+                            ->required()
+                            ->searchable(),
                     ])
             ]);
     }
@@ -50,10 +51,9 @@ class ContactResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('address'),
-                Tables\Columns\TextColumn::make('phone')->searchable(),
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\ImageColumn::make('photo_url'),
+                Tables\Columns\TextColumn::make('slug')->searchable()->sortable(),
+                Tables\Columns\BooleanColumn::make('is_active')->sortable(),
+                Tables\Columns\ImageColumn::make('image_url'),
             ])
             ->filters([
                 //
@@ -69,16 +69,16 @@ class ContactResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AccomodationsRelationManager::class
+            ContactsRelationManager::class
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContacts::route('/'),
-            'create' => Pages\CreateContact::route('/create'),
-            'edit' => Pages\EditContact::route('/{record}/edit'),
+            'index' => Pages\ListAccomodations::route('/'),
+            'create' => Pages\CreateAccomodation::route('/create'),
+            'edit' => Pages\EditAccomodation::route('/{record}/edit'),
         ];
     }
 }
